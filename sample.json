@@ -1,0 +1,34 @@
+{
+  "quizz": [
+    {
+      "question": "What is the capital of France?",
+      "type": "single",
+      "options": ["Paris", "London", "Berlin", "Madrid"],
+      "answer": "Paris"
+    },
+    {
+      "question": "Which of the following are programming languages?",
+      "type": "multiple",
+      "options": ["Python", "HTML", "JavaScript", "CSS"],
+      "answer": ["Python", "JavaScript"]
+    },
+    {
+      "question": "What is the square root of 16?",
+      "type": "number",
+      "options": [],
+      "answer": 4
+    },
+    {
+      "question": "Is the Earth flat?",
+      "type": "boolean",
+      "options": [true, false],
+      "answer": false
+    },
+    {
+      "question": "Enter your favorite color:",
+      "type": "text",
+      "options": [],
+      "answer": "Blue"
+    }
+  ]
+}

@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 
-const Question = ({ question, questionIndex, onSubmit, submittedAnswer }) => {
+const Question = ({
+  question,
+  questionIndex,
+  onSubmit,
+  submittedAnswer,
+  onlyShowResultsAtEnd,
+}) => {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [userAnswer, setUserAnswer] = useState("");
@@ -23,22 +29,37 @@ const Question = ({ question, questionIndex, onSubmit, submittedAnswer }) => {
   }, [submittedAnswer, question.type]);
 
   const handleChoiceSelection = (option) => {
-    if (submitted) return;
+    if (submitted && !onlyShowResultsAtEnd) return;
 
+    let newSelectedOptions;
     if (question.type === "multiple") {
-      setSelectedOptions((prev) =>
-        prev.includes(option)
-          ? prev.filter((item) => item !== option)
-          : [...prev, option]
-      );
+      if (selectedOptions.includes(option)) {
+        newSelectedOptions = selectedOptions.filter((item) => item !== option);
+      } else {
+        newSelectedOptions = [...selectedOptions, option];
+      }
     } else {
-      setSelectedOptions([option]);
+      newSelectedOptions = [option];
+    }
+    setSelectedOptions(newSelectedOptions);
+
+    if (onlyShowResultsAtEnd) {
+      // Auto-submit
+      onSubmit(questionIndex, newSelectedOptions);
+      setSubmitted(true);
     }
   };
 
   const handleInputChange = (e) => {
-    if (submitted) return;
-    setUserAnswer(e.target.value);
+    if (submitted && !onlyShowResultsAtEnd) return;
+    const value = e.target.value;
+    setUserAnswer(value);
+
+    if (onlyShowResultsAtEnd) {
+      // Auto-submit
+      onSubmit(questionIndex, value);
+      setSubmitted(true);
+    }
   };
 
   const handleSubmit = () => {
@@ -52,10 +73,22 @@ const Question = ({ question, questionIndex, onSubmit, submittedAnswer }) => {
     onSubmit(questionIndex, answerData);
   };
 
+  const isUserAnswerCorrect = () => {
+    if (!submitted) return false;
+    const correctAnswer = question.answer.toString().trim().toLowerCase();
+    const userResponse = userAnswer.toString().trim().toLowerCase();
+    return userResponse === correctAnswer;
+  };
+
   const getOptionBgColor = (option) => {
+    if (onlyShowResultsAtEnd) {
+      return selectedOptions.includes(option) ? "bg-info" : "";
+    }
+
     if (!submitted) {
       return selectedOptions.includes(option) ? "bg-info" : "";
     }
+
     const isCorrect = (() => {
       if (Array.isArray(question.answer)) {
         return question.answer.includes(option);
@@ -71,10 +104,12 @@ const Question = ({ question, questionIndex, onSubmit, submittedAnswer }) => {
   };
 
   const getInputBgColor = () => {
+    if (onlyShowResultsAtEnd) {
+      return "";
+    }
+
     if (!submitted) return "";
-    const correctAnswer = question.answer.toString().trim().toLowerCase();
-    const userResponse = userAnswer.toString().trim().toLowerCase();
-    return userResponse === correctAnswer
+    return isUserAnswerCorrect()
       ? "bg-success text-white"
       : "bg-danger text-white";
   };
@@ -102,7 +137,8 @@ const Question = ({ question, questionIndex, onSubmit, submittedAnswer }) => {
                 className={`card mb-2 ${getOptionBgColor(valueOption)}`}
                 onClick={() => handleChoiceSelection(valueOption)}
                 style={{
-                  cursor: submitted ? "default" : "pointer",
+                  cursor:
+                    submitted && !onlyShowResultsAtEnd ? "default" : "pointer",
                   width: "100%",
                 }}
               >
@@ -113,20 +149,31 @@ const Question = ({ question, questionIndex, onSubmit, submittedAnswer }) => {
             );
           })
         ) : (
-          <input
-            type={question.type}
-            className={`form-control mb-3 ${getInputBgColor()}`}
-            placeholder="Enter your answer"
-            value={userAnswer}
-            onChange={handleInputChange}
-            disabled={submitted}
-          />
+          <div>
+            <input
+              type={question.type}
+              className={`form-control mb-3 ${getInputBgColor()}`}
+              placeholder="Enter your answer"
+              value={userAnswer}
+              onChange={handleInputChange}
+              disabled={submitted && !onlyShowResultsAtEnd}
+            />
+            {/* Display correct answer if submitted and incorrect */}
+            {!onlyShowResultsAtEnd && submitted && !isUserAnswerCorrect() && (
+              <div className="alert alert-info">
+                The correct answer is: {question.answer}
+              </div>
+            )}
+          </div>
         )}
       </div>
-      {!submitted && (
-        <button className="btn btn-primary" onClick={handleSubmit}>
-          Submit
-        </button>
+      {/* Hide the Submit button if "Only show results at the end" is checked */}
+      {!onlyShowResultsAtEnd && !submitted && (
+        <div className="text-end">
+          <button className="btn btn-primary" onClick={handleSubmit}>
+            Submit
+          </button>
+        </div>
       )}
     </div>
   );

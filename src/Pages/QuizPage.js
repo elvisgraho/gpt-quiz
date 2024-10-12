@@ -30,6 +30,8 @@ const QuizPage = () => {
     );
   }
 
+  const onlyShowResultsAtEnd = quizData.onlyShowResultsAtEnd || false;
+
   const handleNext = () => {
     if (currentQuestionIndex < quizData.quizz.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -71,6 +73,7 @@ const QuizPage = () => {
         className="card shadow p-5"
         style={{ maxWidth: "600px", width: "100%" }}
       >
+        {/* Question Counter */}
         <div className="mb-4">
           <div className="progress">
             <div
@@ -86,6 +89,7 @@ const QuizPage = () => {
           </div>
         </div>
 
+        {/* Render all questions but display only the current one */}
         {quizData.quizz.map((question, index) => (
           <div
             key={index}
@@ -98,10 +102,12 @@ const QuizPage = () => {
               questionIndex={index}
               onSubmit={handleQuestionSubmit}
               submittedAnswer={submittedAnswers[index]}
+              onlyShowResultsAtEnd={onlyShowResultsAtEnd} // Pass the setting to Question component
             />
           </div>
         ))}
 
+        {/* Buttons Section */}
         <div className="d-flex justify-content-between mt-4">
           <button
             className="btn btn-secondary"

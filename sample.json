@@ -25,10 +25,10 @@
       "answer": false
     },
     {
-      "question": "Enter your favorite color:",
+      "question": "Enter the capital of Germany:",
       "type": "text",
       "options": [],
-      "answer": "Blue"
+      "answer": "Berlin"
     }
   ]
 }

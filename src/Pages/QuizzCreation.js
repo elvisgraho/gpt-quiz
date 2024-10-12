@@ -1,22 +1,30 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { QuizContext } from "../Functional/QuizzContext"; // Import QuizContext
-import { someText } from "../Data/copyText"; // Import the text to copy
+import { QuizContext } from "../Functional/QuizzContext";
+import PromptGenerator from "../Components/PromptGenerator";
 
 const QuizCreation = () => {
   const [inputValue, setInputValue] = useState("");
+  const [onlyShowResultsAtEnd, setOnlyShowResultsAtEnd] = useState(false);
   const [error, setError] = useState("");
-  const { setQuizData } = useContext(QuizContext); // Get the setQuizData function from context
+  const { setQuizData } = useContext(QuizContext);
   const navigate = useNavigate();
-  const [copied, setCopied] = useState(false); // State to track if text is copied
+
+  // Load saved inputValue from localStorage when component mounts
+  useEffect(() => {
+    const savedInputValue = localStorage.getItem("quizInputValue");
+    if (savedInputValue) {
+      setInputValue(savedInputValue);
+    }
+  }, []);
 
   const handleCreateQuiz = () => {
     try {
       // Parse the input as JSON
       const quizData = JSON.parse(inputValue);
 
-      // Store quiz data in context state
-      setQuizData(quizData);
+      // Store quiz data and settings in context state
+      setQuizData({ ...quizData, onlyShowResultsAtEnd });
 
       // Navigate to the Quiz page
       navigate("/quiz");
@@ -26,20 +34,16 @@ const QuizCreation = () => {
   };
 
   const handleInputChange = (e) => {
-    setInputValue(e.target.value);
+    const newValue = e.target.value;
+    setInputValue(newValue);
     setError(""); // Reset error on change
+
+    // Save the new inputValue to localStorage
+    localStorage.setItem("quizInputValue", newValue);
   };
 
-  const handleCopyText = () => {
-    navigator.clipboard.writeText(someText).then(
-      () => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000); // Show "Copied" for 2 seconds
-      },
-      (err) => {
-        console.error("Could not copy text: ", err);
-      }
-    );
+  const handleCheckboxChange = (e) => {
+    setOnlyShowResultsAtEnd(e.target.checked);
   };
 
   return (
@@ -48,7 +52,7 @@ const QuizCreation = () => {
       style={{ minHeight: "100vh" }}
     >
       <div
-        className="card shadow p-4"
+        className="card shadow py-5 px-4" // Added padding here
         style={{ maxWidth: "600px", width: "100%" }}
       >
         <h2 className="text-center mb-4">Create Quiz</h2>
@@ -65,22 +69,35 @@ const QuizCreation = () => {
 
         {error && <p className="text-danger">{error}</p>}
 
-        <div className="d-flex justify-content-between">
-          <button
-            className="btn btn-secondary me-2"
-            onClick={handleCopyText}
-            style={{ width: "200px" }}
-          >
-            {copied ? "Copied!" : "Copy ChatGPT Prompt"}
-          </button>
+        {/* Checkbox for "Only show results at the end" */}
+        <div className="form-check mb-3">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            id="onlyShowResultsAtEnd"
+            checked={onlyShowResultsAtEnd}
+            onChange={handleCheckboxChange}
+          />
+          <label className="form-check-label" htmlFor="onlyShowResultsAtEnd">
+            Only show results at the end
+          </label>
+        </div>
+
+        <div className="d-flex justify-content-center">
           <button
             className="btn btn-primary"
             onClick={handleCreateQuiz}
-            style={{ width: "200px" }}
+            style={{ width: "250px" }}
           >
             Create Quiz
           </button>
         </div>
+
+        {/* Horizontal line */}
+        <hr />
+
+        {/* PromptGenerator component placed after the horizontal line */}
+        <PromptGenerator />
       </div>
     </div>
   );

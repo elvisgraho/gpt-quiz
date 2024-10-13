@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { QuizContext } from "../Functional/QuizzContext";
+import { QuizContext } from "../Functional/QuizContext";
 import PromptGenerator from "../Components/PromptGenerator";
 
 const QuizCreation = () => {

@@ -1,0 +1,286 @@
+{
+  "quiz": [
+    {
+      "question": "What is the main purpose of a Certificate Authority (CA)?",
+      "type": "single",
+      "options": [
+        "Issuing digital certificates to verify identities",
+        "Encrypting all internet traffic",
+        "Generating public and private key pairs",
+        "Providing cloud storage solutions"
+      ],
+      "answer": "Issuing digital certificates to verify identities"
+    },
+    {
+      "question": "Which of the following are valid methods for obtaining a digital certificate?",
+      "type": "multiple",
+      "options": [
+        "Self-signing",
+        "Getting a certificate from a trusted CA",
+        "Copying someone else's certificate",
+        "Generating one on your local machine",
+        "Purchasing from a trusted vendor"
+      ],
+      "answer": [
+        "Self-signing",
+        "Getting a certificate from a trusted CA",
+        "Purchasing from a trusted vendor"
+      ]
+    },
+    {
+      "question": "True or False: A self-signed certificate is automatically trusted by all browsers.",
+      "type": "boolean",
+      "options": [true, false],
+      "answer": false
+    },
+    {
+      "question": "Which of the following certificate formats are widely used?",
+      "type": "multiple",
+      "options": ["PEM", "CER", "PGP", "DER", "BASE64"],
+      "answer": ["PEM", "CER", "DER"]
+    },
+    {
+      "question": "In a Man-in-the-Middle (MitM) attack involving certificates, what is the attacker most likely attempting to do?",
+      "type": "single",
+      "options": [
+        "Decrypt encrypted traffic",
+        "Replace the server's legitimate certificate with a fraudulent one",
+        "Steal a website's private key",
+        "Install a valid certificate on their own server"
+      ],
+      "answer": "Replace the server's legitimate certificate with a fraudulent one"
+    },
+    {
+      "question": "What is the key difference between a wildcard certificate and a regular SSL certificate?",
+      "type": "single",
+      "options": [
+        "Wildcard certificates can secure multiple subdomains",
+        "Wildcard certificates provide stronger encryption",
+        "Wildcard certificates are cheaper",
+        "Regular certificates work across multiple domains"
+      ],
+      "answer": "Wildcard certificates can secure multiple subdomains"
+    },
+    {
+      "question": "True or False: Man-in-the-middle certificate attacks are easily detected by end users.",
+      "type": "boolean",
+      "options": [true, false],
+      "answer": false
+    },
+    {
+      "question": "Which of the following are possible consequences of a compromised certificate?",
+      "type": "multiple",
+      "options": [
+        "Sensitive data theft",
+        "Website impersonation",
+        "Downgrading of encryption algorithms",
+        "Complete server crash",
+        "Trust degradation"
+      ],
+      "answer": [
+        "Sensitive data theft",
+        "Website impersonation",
+        "Trust degradation"
+      ]
+    },
+    {
+      "question": "What happens if a certificate is expired, but the browser still accepts it?",
+      "type": "single",
+      "options": [
+        "The connection is still secure, but a warning is shown",
+        "The encryption is broken, but no warning is shown",
+        "The certificate will automatically renew",
+        "The connection becomes untrusted, but the data is still encrypted"
+      ],
+      "answer": "The connection becomes untrusted, but the data is still encrypted"
+    },
+    {
+      "question": "Which attack technique involves an attacker using a compromised root certificate to generate valid certificates for any website?",
+      "type": "single",
+      "options": [
+        "Certificate forgery",
+        "Certificate poisoning",
+        "Certificate spoofing",
+        "Certificate authority compromise"
+      ],
+      "answer": "Certificate authority compromise"
+    },
+    {
+      "question": "True or False: A certificate's common name (CN) can be different from the domain it secures.",
+      "type": "boolean",
+      "options": [true, false],
+      "answer": false
+    },
+    {
+      "question": "In what situation would you most likely use a self-signed certificate?",
+      "type": "single",
+      "options": [
+        "For securing an internal company application",
+        "For public-facing e-commerce sites",
+        "For mobile app authentication",
+        "To secure a banking website"
+      ],
+      "answer": "For securing an internal company application"
+    },
+    {
+      "question": "Which of the following are valid ways to revoke a certificate?",
+      "type": "multiple",
+      "options": [
+        "Certificate Revocation List (CRL)",
+        "Online Certificate Status Protocol (OCSP)",
+        "Trust manually revoked by the browser",
+        "Cross-signing the certificate",
+        "Key pinning"
+      ],
+      "answer": [
+        "Certificate Revocation List (CRL)",
+        "Online Certificate Status Protocol (OCSP)"
+      ]
+    },
+    {
+      "question": "Which scenario best describes a Man-in-the-Middle (MitM) certificate attack?",
+      "type": "single",
+      "options": [
+        "An attacker intercepts communication and presents a fraudulent certificate to the victim",
+        "An attacker brute forces the encryption algorithm used by a certificate",
+        "An attacker modifies the signature of a certificate to alter its data",
+        "An attacker uses social engineering to obtain the victim's private key"
+      ],
+      "answer": "An attacker intercepts communication and presents a fraudulent certificate to the victim"
+    },
+    {
+      "question": "True or False: Using expired certificates for encrypted communication can expose sensitive data.",
+      "type": "boolean",
+      "options": [true, false],
+      "answer": true
+    },
+    {
+      "question": "Which certificate attribute is used to indicate the entity for whom the certificate was issued?",
+      "type": "single",
+      "options": ["Issuer", "Subject", "Public key", "Common name"],
+      "answer": "Subject"
+    },
+    {
+      "question": "What is a common reason for using an intermediate certificate authority (CA)?",
+      "type": "single",
+      "options": [
+        "Distribute trust over multiple CAs",
+        "Shorten the validity period of certificates",
+        "Improve performance of SSL handshakes",
+        "Enable encryption with weaker ciphers"
+      ],
+      "answer": "Distribute trust over multiple CAs"
+    },
+    {
+      "question": "Which of the following are certificate-related attacks?",
+      "type": "multiple",
+      "options": [
+        "Man-in-the-middle attack",
+        "SSL stripping",
+        "Public key hijacking",
+        "Private key poisoning",
+        "Certificate pinning attack"
+      ],
+      "answer": [
+        "Man-in-the-middle attack",
+        "SSL stripping",
+        "Certificate pinning attack"
+      ]
+    },
+    {
+      "question": "True or False: Public key infrastructure (PKI) is a set of roles, policies, and procedures needed to create, manage, distribute, use, store, and revoke digital certificates.",
+      "type": "boolean",
+      "options": [true, false],
+      "answer": true
+    },
+    {
+      "question": "What might happen if a certificate authority's root certificate is compromised?",
+      "type": "single",
+      "options": [
+        "All certificates issued by the CA will become untrusted",
+        "Nothing, only the specific certificate is affected",
+        "Encryption of existing connections will strengthen",
+        "Private keys of all issued certificates will be revealed"
+      ],
+      "answer": "All certificates issued by the CA will become untrusted"
+    },
+    {
+      "question": "Which method is used to validate the identity of the certificate holder during a certificate issuance process?",
+      "type": "single",
+      "options": [
+        "Email verification",
+        "IP address verification",
+        "Browser pop-up authentication",
+        "Social media verification"
+      ],
+      "answer": "Email verification"
+    },
+    {
+      "question": "True or False: HSTS (HTTP Strict Transport Security) can prevent man-in-the-middle certificate attacks.",
+      "type": "boolean",
+      "options": [true, false],
+      "answer": true
+    },
+    {
+      "question": "What is the most likely result of improperly pinning a certificate in a mobile application?",
+      "type": "single",
+      "options": [
+        "Failure to connect to any server",
+        "Increased vulnerability to MitM attacks",
+        "Slower certificate validation times",
+        "Automatic trust of all certificates"
+      ],
+      "answer": "Failure to connect to any server"
+    },
+    {
+      "question": "Which of the following might indicate a man-in-the-middle attack with a fraudulent certificate?",
+      "type": "multiple",
+      "options": [
+        "Certificate not matching the domain name",
+        "Weak encryption algorithm",
+        "Unrecognized certificate authority",
+        "Shorter than usual certificate validity period",
+        "Connection warnings in the browser"
+      ],
+      "answer": [
+        "Certificate not matching the domain name",
+        "Unrecognized certificate authority",
+        "Connection warnings in the browser"
+      ]
+    },
+    {
+      "question": "True or False: Wildcard certificates are ideal for securing all types of services, including payment gateways.",
+      "type": "boolean",
+      "options": [true, false],
+      "answer": false
+    },
+    {
+      "question": "Which certificate field is most important for preventing man-in-the-middle attacks?",
+      "type": "single",
+      "options": [
+        "Common name (CN)",
+        "Subject alternative name (SAN)",
+        "Issuer",
+        "Expiration date"
+      ],
+      "answer": "Subject alternative name (SAN)"
+    },
+    {
+      "question": "What is the primary advantage of using a hardware security module (HSM) in a certificate authority setup?",
+      "type": "single",
+      "options": [
+        "Improved certificate issuance speed",
+        "Stronger protection for private keys",
+        "Simplified certificate renewal",
+        "Reduced certificate costs"
+      ],
+      "answer": "Stronger protection for private keys"
+    },
+    {
+      "question": "True or False: Publicly trusted certificates can be issued by any certificate authority.",
+      "type": "boolean",
+      "options": [true, false],
+      "answer": false
+    }
+  ]
+}

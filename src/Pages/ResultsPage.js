@@ -5,12 +5,12 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
 const ResultsPage = ({ quizData, submittedAnswers }) => {
-  const totalQuestions = quizData.quizz.length;
+  const totalQuestions = quizData.quiz.length;
   let correctAnswersCount = 0;
   let wrongAnswersCount = 0;
   const wrongQuestionsByType = {};
 
-  quizData.quizz.forEach((question, index) => {
+  quizData.quiz.forEach((question, index) => {
     const userAnswer = submittedAnswers[index];
     const correctAnswer = question.answer;
 
@@ -80,6 +80,8 @@ const ResultsPage = ({ quizData, submittedAnswers }) => {
         style={{ maxWidth: "800px", width: "100%" }}
       >
         <h2 className="mb-4 text-center">Quiz Results</h2>
+
+        {/* Progress Bar */}
         <div className="progress mb-4">
           <div
             className="progress-bar"
@@ -92,16 +94,40 @@ const ResultsPage = ({ quizData, submittedAnswers }) => {
             {percentageCorrect.toFixed(0)}% Correct
           </div>
         </div>
-        <div className="row mb-4">
-          <div className="col-md-6">
-            <Pie data={pieData} />
-          </div>
-          {wrongAnswersCount > 0 && (
-            <div className="col-md-6">
-              <Pie data={wrongTypesData} />
+
+        {/* Conditional Rendering */}
+        {wrongAnswersCount === 0 ? (
+          // Congratulatory Message and Animation
+          <div className="text-center">
+            <h3 className="mb-4 text-success">
+              Congratulations! Perfect Score!
+            </h3>
+            <div className="mb-4">
+              <i
+                className="fas fa-trophy animate__animated animate__bounceIn"
+                style={{ fontSize: "4rem", color: "#ffc107" }}
+              ></i>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          // Display Charts
+          <div>
+            <div className="row mb-4">
+              {/* First Chart */}
+              <div className="col-md-6">
+                <h5 className="text-center">Correct vs Wrong Answers</h5>
+                <Pie data={pieData} />
+              </div>
+              {/* Second Chart */}
+              <div className="col-md-6">
+                <h5 className="text-center">Wrong Answers by Question Type</h5>
+                <Pie data={wrongTypesData} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Take Another Quiz Button */}
         <div className="text-center">
           <a href="/" className="btn btn-primary">
             Take Another Quiz

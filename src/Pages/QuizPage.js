@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { QuizContext } from "../Functional/QuizzContext";
+import { QuizContext } from "../Functional/QuizContext";
 import Question from "../Components/Question";
 import ResultsPage from "./ResultsPage"; // Import the ResultsPage component
 
@@ -33,7 +33,7 @@ const QuizPage = () => {
   const onlyShowResultsAtEnd = quizData.onlyShowResultsAtEnd || false;
 
   const handleNext = () => {
-    if (currentQuestionIndex < quizData.quizz.length - 1) {
+    if (currentQuestionIndex < quizData.quiz.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
@@ -56,7 +56,7 @@ const QuizPage = () => {
   };
 
   const progressPercentage =
-    ((currentQuestionIndex + 1) / quizData.quizz.length) * 100;
+    ((currentQuestionIndex + 1) / quizData.quiz.length) * 100;
 
   if (quizCompleted) {
     return (
@@ -84,13 +84,13 @@ const QuizPage = () => {
               aria-valuemin="0"
               aria-valuemax="100"
             >
-              {currentQuestionIndex + 1}/{quizData.quizz.length}
+              {currentQuestionIndex + 1}/{quizData.quiz.length}
             </div>
           </div>
         </div>
 
         {/* Render all questions but display only the current one */}
-        {quizData.quizz.map((question, index) => (
+        {quizData.quiz.map((question, index) => (
           <div
             key={index}
             style={{
@@ -116,11 +116,11 @@ const QuizPage = () => {
           >
             Previous
           </button>
-          {currentQuestionIndex < quizData.quizz.length - 1 ? (
+          {currentQuestionIndex < quizData.quiz.length - 1 ? (
             <button
               className="btn btn-secondary"
               onClick={handleNext}
-              disabled={currentQuestionIndex === quizData.quizz.length - 1}
+              disabled={currentQuestionIndex === quizData.quiz.length - 1}
             >
               Next
             </button>

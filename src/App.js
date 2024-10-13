@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import QuizCreation from "./Pages/QuizzCreation";
+import QuizCreation from "./Pages/QuizCreation";
 import QuizPage from "./Pages/QuizPage";
-import { QuizProvider } from "./Functional/QuizzContext";
+import { QuizProvider } from "./Functional/QuizContext";
 
 function App() {
   return (

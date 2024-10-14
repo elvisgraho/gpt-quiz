@@ -10,7 +10,7 @@
 
 
 # production
-# /build
+/build
 /private_tests
 
 # misc

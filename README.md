@@ -1,4 +1,4 @@
-# GPT Quizz
+# GPT Quiz
 
 Generate and complete quizes leveraging ChatGPT
 

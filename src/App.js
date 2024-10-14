@@ -9,7 +9,7 @@ function App() {
     <QuizProvider>
       {/* Add a wrapper div with margin classes */}
       <div className="app-container">
-        <Router>
+        <Router basename="/gpt-quiz">
           <Routes>
             <Route path="/" element={<QuizCreation />} />
             <Route path="/quiz" element={<QuizPage />} />

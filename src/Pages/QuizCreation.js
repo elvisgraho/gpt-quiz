@@ -28,6 +28,11 @@ const QuizCreation = () => {
       // Parse the input as JSON
       const quizData = JSON.parse(inputValue);
 
+      if (!Array.isArray(quizData.quiz) || quizData.quiz.length <= 0) {
+        setError("Invalid JSON data. No questions found.");
+        return;
+      }
+
       // Store quiz data and settings in context state
       setQuizData({ ...quizData, onlyShowResultsAtEnd });
 

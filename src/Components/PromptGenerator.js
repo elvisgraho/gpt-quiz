@@ -49,7 +49,12 @@ const PromptGenerator = () => {
   };
 
   const handleAmountChange = (e) => {
-    const newAmount = e.target.value;
+    const targetValue = e.target.value;
+    let newAmount = targetValue;
+    if (targetValue <= 0 || targetValue > 100) {
+      // support only between 1 and 100 questions
+      newAmount = 10;
+    }
     setAmountOfQuestions(newAmount);
     localStorage.setItem("pg_amountOfQuestions", newAmount);
   };
@@ -77,9 +82,13 @@ const PromptGenerator = () => {
   };
 
   const generatePrompt = () => {
-    const selectedQuestionTypes = Object.keys(questionTypes).filter(
+    let selectedQuestionTypes = Object.keys(questionTypes).filter(
       (type) => questionTypes[type]
     );
+
+    if (!selectedQuestionTypes || selectedQuestionTypes.length <= 0) {
+      selectedQuestionTypes = Object.keys(questionTypes);
+    }
 
     // Construct the core prompt based on the mode
     let corePrompt = `The test is about "${topic}"`;

@@ -93,9 +93,9 @@ const PromptGenerator = () => {
     // Construct the core prompt based on the mode
     let corePrompt = `The test is about "${topic}"`;
     if (mode === "Document") {
-      corePrompt = `The test is based on the document that I will provide you. You can add ideas and questions relevant to the topic in the document provided. If the document has questions and answers already, also use those but rephrase them if possible.`;
+      corePrompt = `The test is based on the document that I provided. You can add ideas and questions relevant to the topic. If the document has questions and answers already, use them but rephrase them if possible. `;
     } else if (mode === "Data") {
-      corePrompt = `The test is based on the data I will provide you. You can add ideas and questions relevant to the topic in the data provided. If the data has questions and answers already, also use those but rephrase them if possible.`;
+      corePrompt = `The test is based on the data I provided. You can add ideas and questions relevant to the topic of the overall theme. If the data has questions and answers already, use them but rephrase them if possible. Data: '${dataInput}'. `;
     }
 
     let typesJsonString = "";
@@ -120,9 +120,9 @@ const PromptGenerator = () => {
       typesJsonString = typesJsonString.slice(0, -1);
     }
 
-    let prompt = `'I want to prepare myself for a test. ${corePrompt}.\nAmountOfQuestions=${amountOfQuestions} SelectedQuestionTypes=${JSON.stringify(
+    let prompt = `'I want to prepare myself for a test. ${corePrompt}; AmountOfQuestions=${amountOfQuestions} SelectedQuestionTypes=${JSON.stringify(
       selectedQuestionTypes
-    )}. When providing me with the quiz, please don't say anything else other than JSON quiz data. Never ask personal questions that have no established answers; only ask questions that have straightforward, well-known, and correct answers. The question sample I provided does not reflect actual type distribution; the majority of questions should be type single or multiple. False answers should be within reason and not stand out as wrong. The data you provide should be accessible to copy to clipboard. The questions should be hard; the test should be hard and is meant for experts. You must have a mix of truthful and untruthful questions. Sometimes be creative and present a specific scenario-based or an situation-based question. Here is the example of data structure: {"quiz":[${typesJsonString}]}'`;
+    )}. When providing me with the quiz, don't say anything else other than JSON quiz data; Never ask personal questions that have no established answers; Only ask questions that have straightforward, well-known and correct answers; The question sample I provided does not reflect the type distribution; The majority of questions should be type single or multiple; False answers should be within reason and not stand out as wrong; The data you provide should be accessible to copy to clipboard; The questions should be hard; The test should be hard and is meant for experts; You must have a mix of truthful and untruthful questions; Sometimes be creative and present a specific scenario-based or an situation-based question; Here is the data structure for your response: {"quiz":[${typesJsonString}]}'`;
 
     return prompt;
   };

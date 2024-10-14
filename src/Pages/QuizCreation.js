@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { QuizContext } from "../Functional/QuizContext";
 import PromptGenerator from "../Components/PromptGenerator";
 import HowItWorksModal from "../Components/HowItWorksModal.js"; // Import the modal component
+import { shuffleArray } from "../Functional/shuffleArray.js";
 
 const QuizCreation = () => {
   const [inputValue, setInputValue] = useState("");
@@ -32,6 +33,20 @@ const QuizCreation = () => {
         setError("Invalid JSON data. No questions found.");
         return;
       }
+
+      // 1. Shuffle the questions
+      quizData.quiz = shuffleArray(quizData.quiz);
+
+      // 2. Shuffle options for 'single' and 'multiple' type questions
+      quizData.quiz = quizData.quiz.map((question) => {
+        if (question.type === "single" || question.type === "multiple") {
+          question.options = shuffleArray(question.options);
+        } else if (question.type === "boolean") {
+          // Ensure that 'True' is always first
+          question.options = ["True", "False"];
+        }
+        return question;
+      });
 
       // Store quiz data and settings in context state
       setQuizData({ ...quizData, onlyShowResultsAtEnd });

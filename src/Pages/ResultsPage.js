@@ -1,14 +1,20 @@
 import React from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
+import { useNavigate } from "react-router-dom";
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
 const ResultsPage = ({ quizData, submittedAnswers }) => {
+  const navigate = useNavigate();
   const totalQuestions = quizData.quiz.length;
+  const wrongQuestionsByType = {};
   let correctAnswersCount = 0;
   let wrongAnswersCount = 0;
-  const wrongQuestionsByType = {};
+
+  const handleCreateQuiz = () => {
+    navigate("/");
+  };
 
   quizData.quiz.forEach((question, index) => {
     const userAnswer = submittedAnswers[index];
@@ -127,9 +133,9 @@ const ResultsPage = ({ quizData, submittedAnswers }) => {
         )}
 
         <div className="text-center">
-          <a href="/" className="btn btn-primary">
+          <button onClick={handleCreateQuiz} className="btn btn-primary">
             Create Quiz
-          </a>
+          </button>
         </div>
       </div>
     </div>

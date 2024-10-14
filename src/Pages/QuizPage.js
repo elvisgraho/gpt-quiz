@@ -71,9 +71,9 @@ const QuizPage = () => {
               <code>{JSON.stringify(quizData)}</code>
             </pre>
           )}
-          <a href="/" className="btn btn-primary">
+          <button onClick={handlePrevious} className="btn btn-primary">
             Go Back to Create Quiz
-          </a>
+          </button>
         </div>
       </div>
     );

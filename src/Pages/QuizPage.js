@@ -1,13 +1,62 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useRef } from "react";
 import { QuizContext } from "../Functional/QuizContext";
 import Question from "../Components/Question";
-import ResultsPage from "./ResultsPage"; // Import the ResultsPage component
+import ResultsPage from "./ResultsPage";
+import { useNavigate } from "react-router-dom";
 
 const QuizPage = () => {
   const { quizData } = useContext(QuizContext);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [submittedAnswers, setSubmittedAnswers] = useState({});
   const [quizCompleted, setQuizCompleted] = useState(false);
+  const questionRef = useRef(null);
+
+  const navigate = useNavigate();
+
+  const onlyShowResultsAtEnd = quizData?.onlyShowResultsAtEnd || false;
+
+  // Calculate progress percentage
+  const progressPercentage =
+    quizData && quizData.quiz
+      ? ((currentQuestionIndex + 1) / quizData.quiz.length) * 100
+      : 0;
+
+  // Check if the current question has been submitted
+  const isQuestionSubmitted =
+    submittedAnswers[currentQuestionIndex] !== undefined;
+
+  // Handler functions
+  const handleNext = () => {
+    if (currentQuestionIndex < quizData.quiz.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    } else {
+      // Navigate back to Create Quiz if on the first question
+      navigate("/");
+    }
+  };
+
+  const handleQuestionSubmit = (questionIndex, answerData) => {
+    setSubmittedAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [questionIndex]: answerData,
+    }));
+  };
+
+  const handleFinish = () => {
+    setQuizCompleted(true);
+  };
+
+  const handleSubmit = () => {
+    if (questionRef.current) {
+      questionRef.current.submitAnswer();
+    }
+  };
 
   if (!quizData || Object.keys(quizData).length === 0) {
     return (
@@ -29,34 +78,6 @@ const QuizPage = () => {
       </div>
     );
   }
-
-  const onlyShowResultsAtEnd = quizData.onlyShowResultsAtEnd || false;
-
-  const handleNext = () => {
-    if (currentQuestionIndex < quizData.quiz.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
-  };
-
-  const handleQuestionSubmit = (questionIndex, answerData) => {
-    setSubmittedAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [questionIndex]: answerData,
-    }));
-  };
-
-  const handleFinish = () => {
-    setQuizCompleted(true);
-  };
-
-  const progressPercentage =
-    ((currentQuestionIndex + 1) / quizData.quiz.length) * 100;
 
   if (quizCompleted) {
     return (
@@ -89,39 +110,35 @@ const QuizPage = () => {
           </div>
         </div>
 
-        {/* Render all questions but display only the current one */}
-        {quizData.quiz.map((question, index) => (
-          <div
-            key={index}
-            style={{
-              display: index === currentQuestionIndex ? "block" : "none",
-            }}
-          >
-            <Question
-              question={question}
-              questionIndex={index}
-              onSubmit={handleQuestionSubmit}
-              submittedAnswer={submittedAnswers[index]}
-              onlyShowResultsAtEnd={onlyShowResultsAtEnd} // Pass the setting to Question component
-            />
-          </div>
-        ))}
+        {/* Render only the current question with a unique key */}
+        <Question
+          key={currentQuestionIndex} // Add a unique key based on currentQuestionIndex
+          ref={questionRef}
+          question={quizData.quiz[currentQuestionIndex]}
+          questionIndex={currentQuestionIndex}
+          onSubmit={handleQuestionSubmit}
+          submittedAnswer={submittedAnswers[currentQuestionIndex]}
+          onlyShowResultsAtEnd={onlyShowResultsAtEnd}
+        />
 
         {/* Buttons Section */}
         <div className="d-flex justify-content-between mt-4">
-          <button
-            className="btn btn-secondary"
-            onClick={handlePrevious}
-            disabled={currentQuestionIndex === 0}
-          >
-            Previous
-          </button>
-          {currentQuestionIndex < quizData.quiz.length - 1 ? (
-            <button
-              className="btn btn-secondary"
-              onClick={handleNext}
-              disabled={currentQuestionIndex === quizData.quiz.length - 1}
-            >
+          {currentQuestionIndex === 0 ? (
+            <button className="btn btn-danger" onClick={() => navigate("/")}>
+              Back to Create Quiz
+            </button>
+          ) : (
+            <button className="btn btn-secondary" onClick={handlePrevious}>
+              Previous
+            </button>
+          )}
+
+          {!isQuestionSubmitted ? (
+            <button className="btn btn-primary" onClick={handleSubmit}>
+              Submit
+            </button>
+          ) : currentQuestionIndex < quizData.quiz.length - 1 ? (
+            <button className="btn btn-secondary" onClick={handleNext}>
               Next
             </button>
           ) : (

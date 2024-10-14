@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/gpt-quizz/static/css/main.392253c6.css",
-    "main.js": "/gpt-quizz/static/js/main.bab3a0af.js",
+    "main.js": "/gpt-quizz/static/js/main.9503f811.js",
     "static/js/453.a57c9f52.chunk.js": "/gpt-quizz/static/js/453.a57c9f52.chunk.js",
     "static/media/fa-solid-900.ttf": "/gpt-quizz/static/media/fa-solid-900.07ed6d5fa32c1d54af0f.ttf",
     "static/media/fa-brands-400.ttf": "/gpt-quizz/static/media/fa-brands-400.0ff70dcbf135d859ebf3.ttf",
@@ -13,11 +13,11 @@
     "static/media/fa-v4compatibility.woff2": "/gpt-quizz/static/media/fa-v4compatibility.6cfec8414be20e2c3426.woff2",
     "index.html": "/gpt-quizz/index.html",
     "main.392253c6.css.map": "/gpt-quizz/static/css/main.392253c6.css.map",
-    "main.bab3a0af.js.map": "/gpt-quizz/static/js/main.bab3a0af.js.map",
+    "main.9503f811.js.map": "/gpt-quizz/static/js/main.9503f811.js.map",
     "453.a57c9f52.chunk.js.map": "/gpt-quizz/static/js/453.a57c9f52.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.392253c6.css",
-    "static/js/main.bab3a0af.js"
+    "static/js/main.9503f811.js"
   ]
 }

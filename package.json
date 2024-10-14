@@ -2,7 +2,7 @@
   "name": "gpt-quiz",
   "version": "0.1.0",
   "private": true,
-  "homepage": "gpt-quizz/",
+  "homepage": "https://elvisgraho.github.io/gpt-quizz",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.6.0",
     "@testing-library/jest-dom": "^5.17.0",

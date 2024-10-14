@@ -73,10 +73,10 @@ const ResultsPage = ({ quizData, submittedAnswers }) => {
   return (
     <div
       className="container d-flex flex-column justify-content-center align-items-center"
-      style={{ minHeight: "100vh" }}
+      style={{ minHeight: "calc(100vh - 80px)" }}
     >
       <div
-        className="card shadow p-5"
+        className="card shadow p-3 p-md-5"
         style={{ maxWidth: "800px", width: "100%" }}
       >
         <h2 className="mb-4 text-center">Quiz Results</h2>
@@ -95,7 +95,6 @@ const ResultsPage = ({ quizData, submittedAnswers }) => {
           </div>
         </div>
 
-        {/* Conditional Rendering */}
         {wrongAnswersCount === 0 ? (
           // Congratulatory Message and Animation
           <div className="text-center">
@@ -127,10 +126,9 @@ const ResultsPage = ({ quizData, submittedAnswers }) => {
           </div>
         )}
 
-        {/* Take Another Quiz Button */}
         <div className="text-center">
           <a href="/" className="btn btn-primary">
-            Take Another Quiz
+            Create Quiz
           </a>
         </div>
       </div>

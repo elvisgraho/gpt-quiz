@@ -62,7 +62,7 @@ const QuizPage = () => {
     return (
       <div
         className="container d-flex justify-content-center align-items-center"
-        style={{ minHeight: "100vh" }}
+        style={{ minHeight: "calc(100vh - 80px)" }}
       >
         <div className="card shadow p-4 text-center">
           <h2 className="mb-4">No Quiz Data Available</h2>
@@ -88,10 +88,10 @@ const QuizPage = () => {
   return (
     <div
       className="container d-flex justify-content-center align-items-center"
-      style={{ minHeight: "100vh" }}
+      style={{ minHeight: "calc(100vh - 80px)" }}
     >
       <div
-        className="card shadow p-5"
+        className="card shadow p-3 p-md-5"
         style={{ maxWidth: "600px", width: "100%" }}
       >
         {/* Question Counter */}
@@ -122,7 +122,7 @@ const QuizPage = () => {
         />
 
         {/* Buttons Section */}
-        <div className="d-flex justify-content-between mt-4">
+        <div className="d-flex justify-content-between mt-2">
           {currentQuestionIndex === 0 ? (
             <button className="btn btn-danger" onClick={() => navigate("/")}>
               Back to Create Quiz
@@ -133,7 +133,7 @@ const QuizPage = () => {
             </button>
           )}
 
-          {!isQuestionSubmitted ? (
+          {!isQuestionSubmitted && !onlyShowResultsAtEnd ? (
             <button className="btn btn-primary" onClick={handleSubmit}>
               Submit
             </button>

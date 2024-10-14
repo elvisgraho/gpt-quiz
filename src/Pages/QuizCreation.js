@@ -59,7 +59,7 @@ const QuizCreation = () => {
   return (
     <div
       className="container d-flex justify-content-center align-items-center"
-      style={{ minHeight: "100vh" }}
+      style={{ minHeight: "calc(100vh - 80px)" }}
     >
       <div
         className="card shadow py-4 px-4"

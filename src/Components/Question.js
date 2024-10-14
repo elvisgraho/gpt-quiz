@@ -133,6 +133,11 @@ const Question = forwardRef(
     return (
       <div>
         <h4 className="mb-4 text-center">{question.question}</h4>
+
+        {question.type === "multiple" && (
+          <p className="text-muted text-center">(multiple choice)</p>
+        )}
+
         <div className="mb-4 d-flex flex-column align-items-stretch">
           {question.type === "multiple" ||
           question.type === "single" ||

@@ -157,7 +157,7 @@ const PromptGenerator = () => {
       </div>
 
       {/* Mode description */}
-      <div className="text-center mb-3">
+      <div className="text mb-2">
         <small className="text-muted">{modeDescriptions[mode]}</small>
       </div>
 

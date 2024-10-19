@@ -17,9 +17,9 @@ const PromptGenerator = () => {
       : {
           single: true,
           multiple: true,
-          number: true,
+          number: false,
           boolean: true,
-          text: true,
+          text: false,
         };
   });
   const [copied, setCopied] = useState(false); // State to track if text is copied
@@ -91,11 +91,11 @@ const PromptGenerator = () => {
     }
 
     // Construct the core prompt based on the mode
-    let corePrompt = `The test is about "${topic}"`;
+    let corePrompt = `The test is about "${topic}";`;
     if (mode === "Document") {
-      corePrompt = `The test is based on the document that I provided. You can add ideas and questions relevant to the topic. If the document has questions and answers already, use them but rephrase them if possible. `;
+      corePrompt = `The test is based on the document provided and must use the document when constructing the questions; If the document has questions and answers already, use them but rephrase them if possible;`;
     } else if (mode === "Data") {
-      corePrompt = `The test is based on the data I provided. You can add ideas and questions relevant to the topic of the overall theme. If the data has questions and answers already, use them but rephrase them if possible. Data: '${dataInput}'. `;
+      corePrompt = `The test is based on the data provided. Questions relevant to the topic of the overall theme are allowed; If the data has questions and answers already, use them but rephrase them if possiblel The data for the test: '${dataInput}';`;
     }
 
     let typesJsonString = "";
@@ -104,7 +104,7 @@ const PromptGenerator = () => {
         typesJsonString += `{"question":"What is the capital of France?","type":"single","options":["Paris","London","Berlin","Madrid"],"answer":"Paris"},`;
       } else if (questionType === "multiple") {
         corePrompt +=
-          " Multiple choice questions can have more than 4 answers.";
+          " Multiple choice questions can have more than 4 answers;";
         typesJsonString += `{"question":"Which of the following are programming languages?","type":"multiple","options":["Python","HTML","JavaScript","CSS"],"answer":["Python","JavaScript"]},`;
       } else if (questionType === "number") {
         typesJsonString += `{"question":"What is the square root of 16?","type":"number","options":[],"answer":4},`;
@@ -120,9 +120,28 @@ const PromptGenerator = () => {
       typesJsonString = typesJsonString.slice(0, -1);
     }
 
-    let prompt = `'I want to prepare myself for a test. ${corePrompt}; AmountOfQuestions=${amountOfQuestions} SelectedQuestionTypes=${JSON.stringify(
-      selectedQuestionTypes
-    )}. When providing me with the quiz, don't say anything else other than JSON quiz data; Never ask personal questions that have no established answers; Only ask questions that have straightforward, well-known and correct answers; The question sample I provided does not reflect the type distribution; The majority of questions should be type single or multiple; False answers should be within reason and not stand out as wrong; The data you provide should be accessible to copy to clipboard; The questions should be hard; The test should be hard and is meant for experts; You must have a mix of truthful and untruthful questions; Sometimes be creative and present a specific scenario-based or an situation-based question; Here is the data structure for your response: {"quiz":[${typesJsonString}]}'`;
+    const corePromptList = [
+      // core
+      `I want to prepare myself for a test. ${corePrompt};`,
+      `Amount of questions: ${amountOfQuestions};`,
+      `Allowed question types: ${JSON.stringify(selectedQuestionTypes)};`,
+      // questions
+      `Personal and abstract questions that have no established answers are not allowed;`,
+      `Only questions that are straightforward with well-established answers are allowed;`,
+      `Questions which include the answer in the question itself are not allowed;`,
+      `The test and the questions should be hard and are for experts;`,
+      `The test must have a mix of truthful and untruthful questions;`,
+      `The test must have some creative scenario-based or situation-based questions;`,
+      // answers
+      `False options and answers should be within reason and not stand out as wrong;`,
+      // output
+      `The output must be accessible for clipboard copy;`,
+      `When generating an output, don't include anything else other than the output JSON test;`,
+      `The question sample provided does not reflect the question type distribution;`,
+      `This is the data structure for your response: {"quiz":[${typesJsonString}]};`,
+    ];
+
+    const prompt = `${corePromptList.join(" ")}`;
 
     return prompt;
   };
@@ -130,7 +149,8 @@ const PromptGenerator = () => {
   // Descriptions for each mode
   const modeDescriptions = {
     Topic: "Provide a topic for the quiz to ChatGPT.",
-    Document: "Attach a document to ChatGPT and paste this prompt.",
+    Document:
+      "Attach a document to ChatGPT and paste this prompt. Hint: for books, it is better to construct the quiz one chapter at a time.",
     Data: "Paste data into the textarea and copy the prompt for ChatGPT.",
   };
 

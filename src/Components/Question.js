@@ -45,16 +45,27 @@ const Question = forwardRef(
           // Handle double backticks
           if (i + 1 < parts.length) {
             result.push('<code class="bg-muted/50 dark:bg-muted/80 border border-border/50 dark:border-border/30 px-1.5 py-0.5 rounded font-mono text-sm">');
-            result.push(parts[i + 1]);
+            result.push(escapeHtml(parts[i + 1]));
             result.push('</code>');
             i++; // Skip the next part as we've already processed it
           }
         } else {
-          result.push(part);
+          if (inCodeBlock) {
+            result.push(escapeHtml(part));
+          } else {
+            result.push(part);
+          }
         }
       }
 
       return result.join('');
+    };
+
+    // Helper function to escape HTML special characters
+    const escapeHtml = (text) => {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
     };
 
     useEffect(() => {

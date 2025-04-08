@@ -1,15 +1,19 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { QuizContext } from "../Functional/QuizContext";
+import { useQuiz } from "../Functional/QuizContext";
 import PromptGenerator from "../Components/PromptGenerator";
 import HowItWorksModal from "../Components/HowItWorksModal.js"; // Import the modal component
 import { shuffleArray } from "../Functional/shuffleArray.js";
+import { motion } from "framer-motion";
+import { History } from "lucide-react";
+import QuizHistoryPanel from "../Components/QuizHistoryPanel";
 
 const QuizCreation = () => {
   const [inputValue, setInputValue] = useState("");
   const [onlyShowResultsAtEnd, setOnlyShowResultsAtEnd] = useState(false);
   const [error, setError] = useState("");
-  const { setQuizData } = useContext(QuizContext);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const { setQuizData, quizHistory, deleteFromHistory, clearHistory } = useQuiz();
   const navigate = useNavigate();
 
   // State for modal and accordion
@@ -76,28 +80,60 @@ const QuizCreation = () => {
 
   const toggleAccordion = () => setAccordionOpen(!accordionOpen);
 
-  return (
-    <div
-      className="container d-flex justify-content-center align-items-center"
-      style={{ minHeight: "calc(100vh - 80px)" }}
-    >
-      <div
-        className="card shadow py-4 px-4"
-        style={{ maxWidth: "600px", width: "100%" }}
-      >
-        <h2 className="text-center mb-1">Create Quiz</h2>
+  const handleHistorySelect = (historyItem) => {
+    const quizDataFromHistory = {
+      ...historyItem.quizData,
+      fromHistory: true
+    };
+    setQuizData(quizDataFromHistory);
+    setIsHistoryOpen(false);
+    navigate("/quiz");
+  };
 
-        <div className="text-center mb-3">
-          <button className="btn btn-link" onClick={handleOpenModal}>
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="relative w-full"
+    >
+      <div className="fixed left-4 top-4 z-50 flex gap-2">
+        <button
+          onClick={() => setIsHistoryOpen(true)}
+          className="rounded-full bg-primary p-2 text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform hover:scale-105"
+        >
+          <History className="h-5 w-5" />
+        </button>
+      </div>
+
+      <QuizHistoryPanel
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        history={quizHistory}
+        onDelete={deleteFromHistory}
+        onSelect={handleHistorySelect}
+        onClear={clearHistory}
+      />
+
+      <div className="rounded-lg border bg-card p-6 shadow-lg">
+        <h2 className="mb-2 text-center text-2xl font-bold text-foreground">
+          Create Quiz
+        </h2>
+
+        <div className="mb-4 text-center">
+          <button
+            onClick={handleOpenModal}
+            className="text-sm text-muted-foreground hover:text-primary"
+          >
             How does this work?
           </button>
         </div>
 
         <HowItWorksModal show={showModal} handleClose={handleCloseModal} />
 
-        <div className="form-group mb-3">
+        <div className="mb-4">
           <textarea
-            className="form-control"
+            className="w-full rounded-md border bg-background p-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             placeholder="Enter JSON-formatted quiz data"
             value={inputValue}
             onChange={handleInputChange}
@@ -105,67 +141,59 @@ const QuizCreation = () => {
           />
         </div>
 
-        {error && <p className="text-danger">{error}</p>}
+        {error && (
+          <p className="mb-4 text-sm text-destructive">{error}</p>
+        )}
 
-        {/* Checkbox for "Only show results at the end" */}
-        <div className="form-check mb-3">
+        <div className="mb-6 flex items-center">
           <input
-            className="form-check-input"
             type="checkbox"
             id="onlyShowResultsAtEnd"
             checked={onlyShowResultsAtEnd}
             onChange={handleCheckboxChange}
+            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
           />
-          <label className="form-check-label" htmlFor="onlyShowResultsAtEnd">
+          <label
+            htmlFor="onlyShowResultsAtEnd"
+            className="ml-2 text-sm text-foreground"
+          >
             Only show results at the end
           </label>
         </div>
 
-        <div className="d-flex justify-content-center">
-          <button
-            className="btn btn-primary"
+        <div className="mb-6 flex justify-center">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handleCreateQuiz}
-            style={{ width: "250px" }}
+            className="w-full max-w-xs rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
           >
             Create Quiz
-          </button>
+          </motion.button>
         </div>
 
-        {/* Horizontal line */}
-        <hr />
-
-        {/* Accordion for PromptGenerator */}
-        <div className="accordion" id="promptGeneratorAccordion">
-          <div className="card">
-            <div
-              className="card-header bg-secondary text-white"
-              id="headingOne"
-              onClick={toggleAccordion}
-              style={{ cursor: "pointer" }}
-            >
-              <p className="mb-0 text-center">
-                {accordionOpen
-                  ? "Hide Prompt Generator"
-                  : "Show Prompt Generator"}
-              </p>
-            </div>
-
-            {accordionOpen && (
-              <div
-                id="collapseOne"
-                className="collapse show"
-                aria-labelledby="headingOne"
-              >
-                <div className="card-body">
-                  {/* PromptGenerator component */}
-                  <PromptGenerator />
-                </div>
-              </div>
-            )}
+        <div className="border-t border-border pt-6">
+          <div
+            className="cursor-pointer rounded-lg bg-secondary p-4 text-center text-sm font-medium text-secondary-foreground hover:bg-secondary/80"
+            onClick={toggleAccordion}
+          >
+            {accordionOpen ? "Hide Prompt Generator" : "Show Prompt Generator"}
           </div>
+
+          {accordionOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mt-4"
+            >
+              <PromptGenerator />
+            </motion.div>
+          )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

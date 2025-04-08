@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 
 const PromptGenerator = () => {
   // Initialize state from localStorage or default values
@@ -15,12 +16,12 @@ const PromptGenerator = () => {
     return savedQuestionTypes
       ? JSON.parse(savedQuestionTypes)
       : {
-          single: true,
-          multiple: true,
-          number: false,
-          boolean: true,
-          text: false,
-        };
+        single: true,
+        multiple: true,
+        number: false,
+        boolean: true,
+        text: false,
+      };
   });
   const [copied, setCopied] = useState(false); // State to track if text is copied
 
@@ -51,8 +52,8 @@ const PromptGenerator = () => {
   const handleAmountChange = (e) => {
     const targetValue = e.target.value;
     let newAmount = targetValue;
-    if (targetValue <= 0 || targetValue > 100) {
-      // support only between 1 and 100 questions
+    if (targetValue <= 0 || targetValue > 150) {
+      // support only between 1 and 150 questions
       newAmount = 10;
     }
     setAmountOfQuestions(newAmount);
@@ -101,17 +102,17 @@ const PromptGenerator = () => {
     let typesJsonString = "";
     for (let questionType of selectedQuestionTypes) {
       if (questionType === "single") {
-        typesJsonString += `{"question":"What is the capital of France?","type":"single","options":["Paris","London","Berlin","Madrid"],"answer":"Paris"},`;
+        typesJsonString += `{"id":"q1","question":"What is the capital of France?","type":"single","options":["Paris","London","Berlin","Madrid"],"answer":"Paris","explanation":"Paris has been the capital of France since 987 CE."},`;
       } else if (questionType === "multiple") {
         corePrompt +=
           " Multiple choice questions can have more than 4 answers;";
-        typesJsonString += `{"question":"Which of the following are programming languages?","type":"multiple","options":["Python","HTML","JavaScript","CSS"],"answer":["Python","JavaScript"]},`;
+        typesJsonString += `{"id":"q2","question":"Which of the following are programming languages?","type":"multiple","options":["Python","HTML","JavaScript","CSS"],"answer":["Python","JavaScript"],"explanation":"Python and JavaScript are programming languages, while HTML and CSS are markup and styling languages respectively."},`;
       } else if (questionType === "number") {
-        typesJsonString += `{"question":"What is the square root of 16?","type":"number","options":[],"answer":4},`;
+        typesJsonString += `{"id":"q3","question":"What is the square root of 16?","type":"number","options":[],"answer":4,"explanation":"The square root of 16 is 4 because 4 × 4 = 16."},`;
       } else if (questionType === "boolean") {
-        typesJsonString += `{"question":"Is the Earth flat?","type":"boolean","options":[true,false],"answer":false},`;
+        typesJsonString += `{"id":"q4","question":"Is the Earth flat?","type":"boolean","options":[true,false],"answer":false,"explanation":"The Earth is an oblate spheroid, slightly flattened at the poles and bulging at the equator."},`;
       } else if (questionType === "text") {
-        typesJsonString += `{"question":"Enter the capital of Germany:","type":"text","options":[],"answer":"Berlin"},`;
+        typesJsonString += `{"id":"q5","question":"Enter the capital of Germany:","type":"text","options":[],"answer":"Berlin","explanation":"Berlin has been the capital of Germany since the reunification in 1990."},`;
       }
     }
 
@@ -132,8 +133,17 @@ const PromptGenerator = () => {
       `The test and the questions should be hard and are for experts;`,
       `The test must have a mix of truthful and untruthful questions;`,
       `The test must have some creative scenario-based or situation-based questions;`,
+      `Questions should test deep understanding rather than just memorization;`,
+      `Include questions that require analysis, synthesis, and application of knowledge;`,
+      `Ensure questions are clear, unambiguous, and free from grammatical errors;`,
       // answers
       `False options and answers should be within reason and not stand out as wrong;`,
+      `Do not use A, B, C, D or similar letter prefixes for answer choices - present options as clean text only;`,
+      `For multiple choice questions, ensure all options are plausible and well-thought-out;`,
+      `For multiple choice questions, avoid using "all of the above" or "none of the above" as options;`,
+      `For number questions, provide a reasonable range of possible answers;`,
+      `For text questions, be specific about the expected format of the answer;`,
+      `For boolean questions, ensure both true and false options are equally plausible;`,
       // output
       `The output must be accessible for clipboard copy;`,
       `When generating an output, don't include anything else other than the output JSON test;`,
@@ -155,47 +165,40 @@ const PromptGenerator = () => {
   };
 
   return (
-    <>
-      {/* 3-way toggle */}
-      <div className="d-flex justify-content-center mb-3">
-        <div className="btn-group" role="group">
-          <button
-            type="button"
-            className={`btn btn-${mode === "Topic" ? "primary" : "secondary"}`}
-            onClick={() => handleModeChange("Topic")}
-          >
-            Topic
-          </button>
-          <button
-            type="button"
-            className={`btn btn-${
-              mode === "Document" ? "primary" : "secondary"
-            }`}
-            onClick={() => handleModeChange("Document")}
-          >
-            Document
-          </button>
-          <button
-            type="button"
-            className={`btn btn-${mode === "Data" ? "primary" : "secondary"}`}
-            onClick={() => handleModeChange("Data")}
-          >
-            Data
-          </button>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-4"
+    >
+      <div className="flex justify-center">
+        <div className="inline-flex rounded-lg border border-border bg-card p-1">
+          {["Topic", "Document", "Data"].map((m) => (
+            <motion.button
+              key={m}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleModeChange(m)}
+              className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${mode === m
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              {m}
+            </motion.button>
+          ))}
         </div>
       </div>
 
-      {/* Mode description */}
-      <div className="text mb-2">
-        <small className="text-muted">{modeDescriptions[mode]}</small>
-      </div>
+      <p className="text-center text-sm text-muted-foreground">
+        {modeDescriptions[mode]}
+      </p>
 
-      {/* Conditional inputs based on mode */}
       {mode === "Topic" && (
-        <div className="form-group mb-3">
+        <div>
           <input
             type="text"
-            className="form-control"
+            className="w-full rounded-md border border-border bg-background p-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             placeholder="Enter topic"
             value={topic}
             onChange={handleTopicChange}
@@ -204,9 +207,9 @@ const PromptGenerator = () => {
       )}
 
       {mode === "Data" && (
-        <div className="form-group mb-3">
+        <div>
           <textarea
-            className="form-control"
+            className="w-full rounded-md border border-border bg-background p-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             placeholder="Enter data"
             value={dataInput}
             onChange={handleDataInputChange}
@@ -215,32 +218,43 @@ const PromptGenerator = () => {
         </div>
       )}
 
-      {/* Common inputs */}
-      <div className="form-group mb-3">
-        <label>Amount of Questions:</label>
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-foreground">
+          Amount of Questions: {amountOfQuestions}
+        </label>
         <input
-          type="number"
-          className="form-control"
+          type="range"
+          min="1"
+          max="150"
           value={amountOfQuestions}
           onChange={handleAmountChange}
-          min="1"
+          className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer"
         />
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>1</span>
+          <span>150</span>
+        </div>
       </div>
 
-      <div className="form-group mb-3">
-        <label>Question Types:</label>
-        <div className="form-check">
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-foreground">
+          Question Types:
+        </label>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {["single", "multiple", "number", "boolean", "text"].map((type) => (
-            <div key={type}>
+            <div key={type} className="flex items-center space-x-2">
               <input
-                className="form-check-input"
                 type="checkbox"
                 name={type}
                 checked={questionTypes[type]}
                 onChange={handleQuestionTypeChange}
                 id={type}
+                className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
               />
-              <label className="form-check-label" htmlFor={type}>
+              <label
+                htmlFor={type}
+                className="text-sm text-foreground"
+              >
                 {type.charAt(0).toUpperCase() + type.slice(1)}
               </label>
             </div>
@@ -248,17 +262,15 @@ const PromptGenerator = () => {
         </div>
       </div>
 
-      {/* Copy to clipboard button */}
-      <div className="d-flex justify-content-center">
-        <button
-          className="btn btn-secondary"
-          onClick={handleCopyText}
-          style={{ width: "250px" }}
-        >
-          {copied ? "Copied!" : "Copy ChatGPT Prompt"}
-        </button>
-      </div>
-    </>
+      <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={handleCopyText}
+        className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+      >
+        {copied ? "Copied!" : "Copy to Clipboard"}
+      </motion.button>
+    </motion.div>
   );
 };
 

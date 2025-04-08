@@ -4,6 +4,8 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
+import { motion } from "framer-motion";
+import ExplanationPanel from "./ExplanationPanel";
 
 const Question = forwardRef(
   (
@@ -19,6 +21,41 @@ const Question = forwardRef(
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [submitted, setSubmitted] = useState(false);
     const [userAnswer, setUserAnswer] = useState("");
+    const [showExplanation, setShowExplanation] = useState(false);
+
+    const processQuestionText = (text) => {
+      if (!text) return "";
+
+      // Split the text by backticks
+      const parts = text.split(/(`+)/);
+      let result = [];
+      let inCodeBlock = false;
+
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+
+        if (part === '`') {
+          inCodeBlock = !inCodeBlock;
+          if (inCodeBlock) {
+            result.push('<code class="bg-muted/50 dark:bg-muted/80 border border-border/50 dark:border-border/30 px-1.5 py-0.5 rounded font-mono text-sm">');
+          } else {
+            result.push('</code>');
+          }
+        } else if (part === '``') {
+          // Handle double backticks
+          if (i + 1 < parts.length) {
+            result.push('<code class="bg-muted/50 dark:bg-muted/80 border border-border/50 dark:border-border/30 px-1.5 py-0.5 rounded font-mono text-sm">');
+            result.push(parts[i + 1]);
+            result.push('</code>');
+            i++; // Skip the next part as we've already processed it
+          }
+        } else {
+          result.push(part);
+        }
+      }
+
+      return result.join('');
+    };
 
     useEffect(() => {
       if (submittedAnswer !== undefined) {
@@ -55,7 +92,6 @@ const Question = forwardRef(
       setSelectedOptions(newSelectedOptions);
 
       if (onlyShowResultsAtEnd) {
-        // Auto-submit
         onSubmit(questionIndex, newSelectedOptions);
         setSubmitted(true);
       }
@@ -67,7 +103,6 @@ const Question = forwardRef(
       setUserAnswer(value);
 
       if (onlyShowResultsAtEnd) {
-        // Auto-submit
         onSubmit(questionIndex, value);
         setSubmitted(true);
       }
@@ -77,14 +112,13 @@ const Question = forwardRef(
       setSubmitted(true);
       const answerData =
         question.type === "multiple" ||
-        question.type === "single" ||
-        question.type === "boolean"
+          question.type === "single" ||
+          question.type === "boolean"
           ? selectedOptions
           : userAnswer;
       onSubmit(questionIndex, answerData);
     };
 
-    // Expose handleSubmit to parent via ref
     useImperativeHandle(ref, () => ({
       submitAnswer: handleSubmit,
     }));
@@ -96,13 +130,17 @@ const Question = forwardRef(
       return userResponse === correctAnswer;
     };
 
-    const getOptionBgColor = (option) => {
+    const getOptionClasses = (option) => {
       if (onlyShowResultsAtEnd) {
-        return selectedOptions.includes(option) ? "bg-info" : "";
+        return selectedOptions.includes(option)
+          ? "border-primary bg-blue-500/20 text-blue-500 font-medium"
+          : "border-border hover:border-primary/50 hover:bg-primary/10";
       }
 
       if (!submitted) {
-        return selectedOptions.includes(option) ? "bg-info" : "";
+        return selectedOptions.includes(option)
+          ? "border-primary bg-blue-500/20 text-blue-500 font-medium"
+          : "border-border hover:border-primary/50 hover:bg-primary/10";
       }
 
       const isCorrect = (() => {
@@ -113,35 +151,48 @@ const Question = forwardRef(
         }
       })();
       const isSelected = selectedOptions.includes(option);
-      if (isCorrect && isSelected) return "bg-success text-white";
-      if (!isCorrect && isSelected) return "bg-danger text-white";
-      if (isCorrect && !isSelected) return "bg-warning text-dark";
-      return "";
+
+      if (isCorrect && isSelected) return "border-green-500 bg-green-500/20 text-green-500 font-medium";
+      if (!isCorrect && isSelected) return "border-destructive bg-destructive/20 text-destructive font-medium";
+      if (isCorrect && !isSelected) return "border-yellow-500 bg-yellow-500/20 text-yellow-500 font-medium";
+      return "border-border hover:bg-primary/10";
     };
 
-    const getInputBgColor = () => {
+    const getInputClasses = () => {
       if (onlyShowResultsAtEnd) {
-        return "";
+        return "border-border focus:border-primary focus:ring-2 focus:ring-primary/20";
       }
 
-      if (!submitted) return "";
+      if (!submitted) return "border-border focus:border-primary focus:ring-2 focus:ring-primary/20";
       return isUserAnswerCorrect()
-        ? "bg-success text-white"
-        : "bg-danger text-white";
+        ? "border-green-500 bg-green-500/20 text-green-500"
+        : "border-destructive bg-destructive/20 text-destructive";
     };
 
     return (
-      <div>
-        <h4 className="mb-4 text-center">{question.question}</h4>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-6"
+      >
+        <div className="text-center">
+          <h4
+            className="mb-4 text-xl font-semibold text-foreground"
+            dangerouslySetInnerHTML={{ __html: processQuestionText(question.question) }}
+          />
 
-        {question.type === "multiple" && (
-          <p className="text-muted text-center">(multiple choice)</p>
-        )}
+          {question.type === "multiple" && (
+            <p className="mb-4 text-sm text-muted-foreground">
+              (multiple choice)
+            </p>
+          )}
+        </div>
 
-        <div className="mb-4 d-flex flex-column align-items-stretch">
+        <div className="mb-4 flex flex-col space-y-3">
           {question.type === "multiple" ||
-          question.type === "single" ||
-          question.type === "boolean" ? (
+            question.type === "single" ||
+            question.type === "boolean" ? (
             (question.type === "boolean"
               ? ["True", "False"]
               : question.options
@@ -153,44 +204,60 @@ const Question = forwardRef(
                   ? option.toString().toLowerCase()
                   : option;
               return (
-                <div
+                <motion.div
                   key={index}
-                  className={`card mb-2 ${getOptionBgColor(valueOption)}`}
+                  className={`rounded-lg border p-4 transition-colors ${getOptionClasses(
+                    valueOption
+                  )} ${submitted && !onlyShowResultsAtEnd
+                    ? "cursor-default"
+                    : "cursor-pointer"
+                    }`}
                   onClick={() => handleChoiceSelection(valueOption)}
-                  style={{
-                    cursor:
-                      submitted && !onlyShowResultsAtEnd
-                        ? "default"
-                        : "pointer",
-                    width: "100%",
-                  }}
                 >
-                  <div className="card-body text-center">
-                    <h5 className="card-title">{displayOption}</h5>
-                  </div>
-                </div>
+                  <p
+                    className="text-center text-foreground"
+                    dangerouslySetInnerHTML={{ __html: processQuestionText(displayOption) }}
+                  />
+                </motion.div>
               );
             })
           ) : (
-            <div>
+            <div className="space-y-3">
               <input
                 type={question.type}
-                className={`form-control mb-3 ${getInputBgColor()}`}
+                className={`w-full rounded-md border bg-background p-3 text-foreground transition-colors ${getInputClasses()}`}
                 placeholder="Enter your answer"
                 value={userAnswer}
                 onChange={handleInputChange}
                 disabled={submitted && !onlyShowResultsAtEnd}
               />
-              {/* Display correct answer if submitted and incorrect */}
               {!onlyShowResultsAtEnd && submitted && !isUserAnswerCorrect() && (
-                <div className="alert alert-info">
-                  The correct answer is: {question.answer}
+                <div className="rounded-md bg-muted p-3 text-sm text-muted-foreground">
+                  The correct answer is: <span dangerouslySetInnerHTML={{ __html: processQuestionText(question.answer) }} />
                 </div>
               )}
             </div>
           )}
         </div>
-      </div>
+
+        {!onlyShowResultsAtEnd && submitted && question.explanation && (
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            onClick={() => setShowExplanation(true)}
+            className="w-full rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/80"
+          >
+            Show Explanation
+          </motion.button>
+        )}
+
+        <ExplanationPanel
+          isOpen={showExplanation}
+          onClose={() => setShowExplanation(false)}
+          explanation={processQuestionText(question.explanation)}
+        />
+      </motion.div>
     );
   }
 );

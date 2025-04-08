@@ -1,31 +1,56 @@
-import React, { useContext, useState, useRef } from "react";
-import { QuizContext } from "../Functional/QuizContext";
+import React, { useState, useRef, useEffect } from "react";
+import { useQuiz } from "../Functional/QuizContext";
 import Question from "../Components/Question";
 import ResultsPage from "./ResultsPage";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Clock, History } from "lucide-react";
+import QuizHistoryPanel from "../Components/QuizHistoryPanel";
 
 const QuizPage = () => {
-  const { quizData } = useContext(QuizContext);
+  const { quizData, quizHistory, deleteFromHistory, setQuizData, clearHistory } = useQuiz();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [submittedAnswers, setSubmittedAnswers] = useState({});
   const [quizCompleted, setQuizCompleted] = useState(false);
+  const [timeSpent, setTimeSpent] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(true);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const questionRef = useRef(null);
-
+  const timerRef = useRef(null);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!quizData || Object.keys(quizData).length === 0) {
+      navigate("/");
+    }
+  }, [quizData, navigate]);
+
   const onlyShowResultsAtEnd = quizData?.onlyShowResultsAtEnd || false;
+  const progressPercentage = quizData && quizData.quiz
+    ? ((currentQuestionIndex + 1) / quizData.quiz.length) * 100
+    : 0;
+  const isQuestionSubmitted = submittedAnswers[currentQuestionIndex] !== undefined;
 
-  // Calculate progress percentage
-  const progressPercentage =
-    quizData && quizData.quiz
-      ? ((currentQuestionIndex + 1) / quizData.quiz.length) * 100
-      : 0;
+  useEffect(() => {
+    if (isTimerRunning) {
+      timerRef.current = setInterval(() => {
+        setTimeSpent(prev => prev + 1);
+      }, 1000);
+    }
 
-  // Check if the current question has been submitted
-  const isQuestionSubmitted =
-    submittedAnswers[currentQuestionIndex] !== undefined;
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isTimerRunning]);
 
-  // Handler functions
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
   const handleNext = () => {
     if (currentQuestionIndex < quizData.quiz.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -36,7 +61,6 @@ const QuizPage = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     } else {
-      // Navigate back to Create Quiz if on the first question
       navigate("/");
     }
   };
@@ -49,6 +73,7 @@ const QuizPage = () => {
   };
 
   const handleFinish = () => {
+    setIsTimerRunning(false);
     setQuizCompleted(true);
   };
 
@@ -58,97 +83,159 @@ const QuizPage = () => {
     }
   };
 
-  if (!quizData || Object.keys(quizData).length === 0) {
-    return (
-      <div
-        className="container d-flex justify-content-center align-items-center"
-        style={{ minHeight: "calc(100vh - 80px)" }}
-      >
-        <div className="card shadow p-4 text-center">
-          <h2 className="mb-4">No Quiz Data Available</h2>
-          {typeof quizData === "object" && (
-            <pre className="bg-light p-3 border rounded">
-              <code>{JSON.stringify(quizData)}</code>
-            </pre>
-          )}
-          <button onClick={handlePrevious} className="btn btn-primary">
-            Go Back to Create Quiz
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (quizCompleted) {
-    return (
-      <ResultsPage quizData={quizData} submittedAnswers={submittedAnswers} />
-    );
-  }
+  const handleHistorySelect = (historyItem) => {
+    const quizDataFromHistory = {
+      ...historyItem.quizData,
+      fromHistory: true
+    };
+    setQuizData(quizDataFromHistory);
+    setIsHistoryOpen(false);
+    setCurrentQuestionIndex(0);
+    setSubmittedAnswers({});
+    setQuizCompleted(false);
+    setTimeSpent(0);
+    setIsTimerRunning(true);
+  };
 
   return (
-    <div
-      className="container d-flex justify-content-center align-items-center"
-      style={{ minHeight: "calc(100vh - 80px)" }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="relative w-full"
     >
-      <div
-        className="card shadow p-3 p-md-5"
-        style={{ maxWidth: "600px", width: "100%" }}
-      >
-        {/* Question Counter */}
-        <div className="mb-4">
-          <div className="progress">
-            <div
-              className="progress-bar bg-success"
-              role="progressbar"
-              style={{ width: `${progressPercentage}%` }}
-              aria-valuenow={progressPercentage}
-              aria-valuemin="0"
-              aria-valuemax="100"
+      <QuizHistoryPanel
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        history={quizHistory}
+        onDelete={deleteFromHistory}
+        onSelect={handleHistorySelect}
+        onClear={clearHistory}
+      />
+
+      {!quizData || Object.keys(quizData).length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex min-h-screen items-center justify-center p-4"
+        >
+          <div className="w-full max-w-md rounded-lg border bg-card p-6 shadow-lg">
+            <h2 className="mb-4 text-center text-2xl font-bold text-foreground">
+              No Quiz Data Available
+            </h2>
+            {typeof quizData === "object" && (
+              <pre className="mb-4 rounded-md bg-muted p-3 text-sm">
+                <code>{JSON.stringify(quizData)}</code>
+              </pre>
+            )}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigate("/")}
+              className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >
-              {currentQuestionIndex + 1}/{quizData.quiz.length}
+              Go Back to Create Quiz
+            </motion.button>
+          </div>
+        </motion.div>
+      ) : quizCompleted ? (
+        <ResultsPage quizData={quizData} submittedAnswers={submittedAnswers} timeSpent={timeSpent} />
+      ) : (
+        <div className="mx-auto max-w-4xl rounded-lg border bg-card p-6 shadow-lg">
+          <div className="mb-4 flex items-center justify-between">
+            {quizData.quizTitle && (
+              <h2 className="text-2xl font-bold text-foreground">
+                {quizData.quizTitle}
+              </h2>
+            )}
+            <div className="flex items-center rounded-full bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground cursor-pointer hover:bg-secondary/80 transition-colors" onClick={() => setIsTimerRunning(!isTimerRunning)}>
+              <Clock className="mr-2 h-4 w-4" />
+              <span>{formatTime(timeSpent)}</span>
             </div>
           </div>
+
+          <div className="mb-6">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercentage}%` }}
+                transition={{ duration: 0.3 }}
+                className="h-full bg-primary"
+              >
+                <span className="sr-only">
+                  {currentQuestionIndex + 1}/{quizData.quiz.length}
+                </span>
+              </motion.div>
+            </div>
+            <p className="mt-2 text-center text-sm text-muted-foreground">
+              Question {currentQuestionIndex + 1} of {quizData.quiz.length}
+            </p>
+          </div>
+
+          <div className="min-h-[400px]">
+            <Question
+              key={currentQuestionIndex}
+              ref={questionRef}
+              question={quizData.quiz[currentQuestionIndex]}
+              questionIndex={currentQuestionIndex}
+              onSubmit={handleQuestionSubmit}
+              submittedAnswer={submittedAnswers[currentQuestionIndex]}
+              onlyShowResultsAtEnd={onlyShowResultsAtEnd}
+            />
+          </div>
+
+          <div className="mt-6 flex justify-between">
+            {currentQuestionIndex === 0 ? (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate("/")}
+                className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
+              >
+                Back to Create Quiz
+              </motion.button>
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handlePrevious}
+                className="rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/80"
+              >
+                Previous
+              </motion.button>
+            )}
+
+            {!isQuestionSubmitted && !onlyShowResultsAtEnd ? (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleSubmit}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                Submit
+              </motion.button>
+            ) : currentQuestionIndex < quizData.quiz.length - 1 ? (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleNext}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                Next
+              </motion.button>
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleFinish}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                Finish
+              </motion.button>
+            )}
+          </div>
         </div>
-
-        {/* Render only the current question with a unique key */}
-        <Question
-          key={currentQuestionIndex} // Add a unique key based on currentQuestionIndex
-          ref={questionRef}
-          question={quizData.quiz[currentQuestionIndex]}
-          questionIndex={currentQuestionIndex}
-          onSubmit={handleQuestionSubmit}
-          submittedAnswer={submittedAnswers[currentQuestionIndex]}
-          onlyShowResultsAtEnd={onlyShowResultsAtEnd}
-        />
-
-        {/* Buttons Section */}
-        <div className="d-flex justify-content-between mt-2">
-          {currentQuestionIndex === 0 ? (
-            <button className="btn btn-danger" onClick={() => navigate("/")}>
-              Back to Create Quiz
-            </button>
-          ) : (
-            <button className="btn btn-secondary" onClick={handlePrevious}>
-              Previous
-            </button>
-          )}
-
-          {!isQuestionSubmitted && !onlyShowResultsAtEnd ? (
-            <button className="btn btn-primary" onClick={handleSubmit}>
-              Submit
-            </button>
-          ) : currentQuestionIndex < quizData.quiz.length - 1 ? (
-            <button className="btn btn-secondary" onClick={handleNext}>
-              Next
-            </button>
-          ) : (
-            <button className="btn btn-primary" onClick={handleFinish}>
-              Finish
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+      )}
+    </motion.div>
   );
 };
 

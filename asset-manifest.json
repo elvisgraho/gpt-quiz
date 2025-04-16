@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/gpt-quiz/static/css/main.02ebe628.css",
-    "main.js": "/gpt-quiz/static/js/main.4c79015b.js",
+    "main.css": "/gpt-quiz/static/css/main.7c82c622.css",
+    "main.js": "/gpt-quiz/static/js/main.3f7efe72.js",
     "static/js/453.a57c9f52.chunk.js": "/gpt-quiz/static/js/453.a57c9f52.chunk.js",
     "index.html": "/gpt-quiz/index.html",
-    "main.02ebe628.css.map": "/gpt-quiz/static/css/main.02ebe628.css.map",
-    "main.4c79015b.js.map": "/gpt-quiz/static/js/main.4c79015b.js.map",
+    "main.7c82c622.css.map": "/gpt-quiz/static/css/main.7c82c622.css.map",
+    "main.3f7efe72.js.map": "/gpt-quiz/static/js/main.3f7efe72.js.map",
     "453.a57c9f52.chunk.js.map": "/gpt-quiz/static/js/453.a57c9f52.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.02ebe628.css",
-    "static/js/main.4c79015b.js"
+    "static/css/main.7c82c622.css",
+    "static/js/main.3f7efe72.js"
   ]
 }

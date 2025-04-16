@@ -19,3 +19,24 @@
 .copied-button.copied::after {
   opacity: 1;
 }
+
+/* Styles for code blocks within explanation panel */
+.explanation-content code {
+  display: block; /* Ensure code blocks take full width */
+  white-space: pre-wrap; /* Allow wrapping */
+  word-break: break-all; /* Break long words/strings */
+  overflow-x: auto; /* Add horizontal scroll if needed */
+  background-color: hsl(var(--muted)); /* Use theme color */
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  border-radius: 6px;
+}
+
+/* Inline code styles */
+.explanation-content :not(pre) > code {
+  display: inline; /* Keep inline code inline */
+  white-space: normal; /* Allow normal wrapping for inline */
+  word-break: normal; /* Normal word breaking for inline */
+  overflow-x: visible; /* No scroll for inline */
+}
